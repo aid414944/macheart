@@ -27,10 +27,11 @@ import (
 
 func main() {
 
-    global.Logger.Debug("hehe%s%s" , "hehe", "lijie")
-    global.Logger.Debug("hehe")
-    global.Logger.Info("niemi")
-    global.Logger.Warn("asfdas")
+    global.Logger.Debug("this is a Debug Message!")
+    global.Logger.Info("this is a Info Message!")
+    global.Logger.Warn("this is a Warn Message!")
+    global.Logger.Error("this is a Error Message!")
+    global.Logger.Fatal("this is a Fatal Message!")
 
     // set GOMAXPROCS
     cpus, e := strconv.Atoi(global.Configure["CPUs"])
