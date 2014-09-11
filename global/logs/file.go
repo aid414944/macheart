@@ -62,7 +62,7 @@ func newFileLogger()(LoggerInterface, error){
 
     // set level
     level, err := strconv.Atoi(conf.Get["FileLoggerLevel"])
-    if err != nil || level <= levelFatal || level >=levelDebug {
+    if err != nil || level < levelFatal || level > levelDebug {
         level = defaultFileLoggerLevel // set default level
     }
     filelogger.level = level

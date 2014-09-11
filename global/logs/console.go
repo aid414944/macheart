@@ -46,7 +46,7 @@ func newConsoleLogger() LoggerInterface {
 
     // set level
     level, err := strconv.Atoi(conf.Get["ConsoleLoggerLevel"])
-    if err != nil || level <= levelFatal || level >=levelDebug {
+    if err != nil || level < levelFatal || level > levelDebug {
         level = defaultConsoleLoggerLevel // set default level
     }
     cl.level = level
