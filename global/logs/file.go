@@ -43,7 +43,7 @@ var (
 )
 
 // create FileLogger returning as LoggerInterface
-func newFileLogger()(LoggerInterface, error){
+func NewFileLogger()(LoggerInterface, error){
 
     filelogger := new(FileLogger)
 
@@ -120,7 +120,7 @@ func init() {
 
     isEnable, ok := conf.Get["EnableFileLogger"]
     if isEnable != "0" && ok {
-        fileLogger, err:= newFileLogger()
+        fileLogger, err:= NewFileLogger()
         if err != nil {
             fmt.Printf("init File Logger fail: %v\n", err)
             return

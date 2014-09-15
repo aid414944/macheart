@@ -26,7 +26,17 @@ type Logger struct {
     subloggers []LoggerInterface
 }
 
+// define type prefix of log
+var (
+    fatalPrefix = "[FATAL]"
+    errorPrefix = "[ERROR]"
+    warnPrefix = "[WARN]"
+    infoPrefix = "[INFO]"
+    debugPrefix = "[Debug]"
+)
+
 var subloggers = make([]LoggerInterface, 0, 10)
+
 
 // create Logger
 func NewLogger() *Logger {
@@ -40,7 +50,7 @@ func (lgr *Logger)Fatal(format string, v ...interface {}) {
     lgr.Lock()
     defer lgr.Unlock()
     for _, slg := range lgr.subloggers {
-        slg.Fatal("[Fatal]" + format, v...)
+        slg.Fatal(fatalPrefix + format, v...)
     }
 }
 
@@ -49,7 +59,7 @@ func (lgr *Logger)Error(format string, v ...interface {}) {
     lgr.Lock()
     defer lgr.Unlock()
     for _, slg := range lgr.subloggers {
-        slg.Error("[Error]" + format, v...)
+        slg.Error(errorPrefix + format, v...)
     }
 }
 
@@ -58,7 +68,7 @@ func (lgr *Logger)Warn(format string, v ...interface {}) {
     lgr.Lock()
     defer lgr.Unlock()
     for _, slg := range lgr.subloggers {
-        slg.Warn("[Warn]" + format, v...)
+        slg.Warn(warnPrefix + format, v...)
     }
 }
 
@@ -67,7 +77,7 @@ func (lgr *Logger)Info(format string, v ...interface {}) {
     lgr.Lock()
     defer lgr.Unlock()
     for _, slg := range lgr.subloggers {
-        slg.Info("[Info]" + format, v...)
+        slg.Info(infoPrefix + format, v...)
     }
 }
 
@@ -76,7 +86,7 @@ func (lgr *Logger)Debug(format string, v ...interface {}) {
     lgr.Lock()
     defer lgr.Unlock()
     for _, slg := range lgr.subloggers {
-        slg.Debug("[Debug]" + format, v...)
+        slg.Debug(debugPrefix + format, v...)
     }
 }
 

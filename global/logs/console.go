@@ -36,7 +36,7 @@ var (
 )
 
 // create ConsoleLogger returning as LoggerInterface
-func newConsoleLogger() LoggerInterface {
+func NewConsoleLogger() LoggerInterface {
 
     cl := new(ConsoleLogger)
 
@@ -104,7 +104,7 @@ func init() {
 
     isEnable, ok := conf.Get["EnableConsoleLogger"]
     if isEnable != "0" && ok {
-        register(newConsoleLogger())
+        register(NewConsoleLogger())
     }
 
 }
