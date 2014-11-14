@@ -15,26 +15,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package global
+package server
 
 import (
-    "macheart/conf"
-    "macheart/logs"
-    "path/filepath"
-    "os/exec"
+    "net/rpc"
+    "os"
+    "macheart/global"
 )
 
+type CmdHandleServer struct {
+}
 
-var (
-    // init Configure
-    Configure = conf.Get
-    // init Logger
-    Logger = logs.NewLogger()
-)
+func NewCmdHandleServer() *CmdHandleServer {
+    cmdHandleServer := new(CmdHandleServer)
+    return cmdHandleServer
+}
 
-// the function is used to fork macheart oneself
-func ForkOneself(args []string) error {
-    filePath, _ := filepath.Abs(args[0])
-    cmd := exec.Command(filePath, args[1:]...)
-    return cmd.Start()
+func ( *CmdHandleServer)Exec(cmd *[]string, ok *bool) error {
+    *ok = true
+    switch (*cmd)[1]{
+
+    case "stop":
+        //stopHeart()  //善后处理
+        global.Logger.Info("macheart has stopped!")
+        os.Exit(0)
+
+    default:
+        *ok = false
+
+    }
+    return nil
+}
+
+func init(){
+    cmdHandleServer := NewCmdHandleServer()
+    rpc.Register(cmdHandleServer)
 }

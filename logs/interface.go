@@ -15,26 +15,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package global
+package logs
 
-import (
-    "macheart/conf"
-    "macheart/logs"
-    "path/filepath"
-    "os/exec"
+// define Log Levels
+const  (
+    levelFatal = iota
+    levelError
+    levelWarn
+    levelInfo
+    levelDebug
 )
 
-
-var (
-    // init Configure
-    Configure = conf.Get
-    // init Logger
-    Logger = logs.NewLogger()
-)
-
-// the function is used to fork macheart oneself
-func ForkOneself(args []string) error {
-    filePath, _ := filepath.Abs(args[0])
-    cmd := exec.Command(filePath, args[1:]...)
-    return cmd.Start()
+// define Logger Interfaces
+type LoggerInterface interface {
+    Fatal(format string, v ...interface {})
+    Error(format string, v ...interface {})
+    Warn(format string, v ...interface {})
+    Info(format string, v ...interface {})
+    Debug(format string, v ...interface {})
 }
