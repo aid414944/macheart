@@ -76,14 +76,14 @@ func main() {
             return
         }
 
-        // 启动RPC服务
-        rpcServer := server.New(global.Configure["RpcNetwork"], ":" + global.Configure["RpcPort"])
-        err = rpcServer.Start()
-        if err != nil {
-            global.Logger.Fatal("the RPC server starts has failed: %s", err.Error())
-            return
-        }
+    }
 
+    // 启动RPC服务
+    rpcServer := server.New(global.Configure["RpcNetwork"], ":" + global.Configure["RpcPort"])
+    err := rpcServer.Start()
+    if err != nil {
+        global.Logger.Fatal("the RPC server starts has failed: %s", err.Error())
+        return
     }
 
     startHeart()
