@@ -28,15 +28,16 @@ type CmdHandler struct {
     rpcClient *rpc.Client
 }
 
-func NewCmdHandler(net, addr string)(*CmdHandler, error) {
-
-    rpcClient, err := rpc.Dial(net, addr)
-    if err != nil {return nil, err}
-
+func NewCmdHandler()(*CmdHandler) {
     cmdHandler := new(CmdHandler)
-    cmdHandler.rpcClient = rpcClient
-    return cmdHandler, nil
+    return cmdHandler
+}
 
+func (ch *CmdHandler)LinkServer(net, addr string) error {
+    rpcClient, err := rpc.Dial(net, addr)
+    if err != nil {return err}
+    ch.rpcClient = rpcClient
+    return nil
 }
 
 func (ch *CmdHandler)Close()error{
