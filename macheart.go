@@ -42,17 +42,18 @@ func main() {
     if len(os.Args) > 1 {
 
         // 处理普通参数
-        switch {
-        case os.Args[1] == "--help":
+        switch os.Args[1] {
+        case "--help":
             fmt.Println(helpStr)
             return
-        case os.Args[1] == "--version":
+        case "--version":
             fmt.Println(versionStr)
             return
         }
 
-        //
-        cmdHandler, err := client.NewCmdHandler(global.Configure["RpcNetwork"], ":" + global.Configure["RpcPort"])
+        // 处理特殊参数
+        cmdHandler := client.NewCmdHandler()
+        err := cmdHandler.LinkServer(global.Configure["RpcNetwork"], ":" + global.Configure["RpcPort"])
         if err == nil {
             cmdHandler.Exec(os.Args)
             cmdHandler.Close()
