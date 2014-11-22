@@ -27,8 +27,8 @@ import (
     //"path/filepath"
     "macheart/global"
     //"os/exec"
-    "macheart/rpc/server"
-    "macheart/rpc/client"
+    rpcserver "macheart/rpc/server"
+    rpclient "macheart/rpc/client"
 )
 
 var helpStr =
@@ -52,7 +52,7 @@ func main() {
         }
 
         // 处理特殊参数
-        cmdHandler := client.NewCmdHandler()
+        cmdHandler := rpclient.NewCmdHandler()
         err := cmdHandler.LinkServer(global.Configure["RpcNetwork"], ":" + global.Configure["RpcPort"])
         if err == nil {
             cmdHandler.Exec(os.Args)
@@ -80,7 +80,7 @@ func main() {
     }
 
     // 启动RPC服务
-    rpcServer := server.New(global.Configure["RpcNetwork"], ":" + global.Configure["RpcPort"])
+    rpcServer := rpcserver.New(global.Configure["RpcNetwork"], ":" + global.Configure["RpcPort"])
     err := rpcServer.Start()
     if err != nil {
         global.Logger.Fatal("the RPC server starts has failed: %s", err.Error())
