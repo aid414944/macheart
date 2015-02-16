@@ -18,36 +18,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package server
 
 import (
-    "net/rpc"
-    "os"
-    "macheart/global"
+	"macheart/global"
+	"net/rpc"
+	"os"
 )
 
 type CmdHandleServer struct {
+	cmds map[string]func(args []string) error
 }
 
 func NewCmdHandleServer() *CmdHandleServer {
-    cmdHandleServer := new(CmdHandleServer)
-    return cmdHandleServer
+	chs := new(CmdHandleServer)
+	chs.cmds = make(map[string]func(args []string) error)
+	// stop
+	chs.cmds["stop"] = func(args []string) error {
+		//stopHeart()  //善后处理
+		global.Logger.Info("macheart has stopped!")
+		os.Exit(0)
+		return nil
+	}
+
+	return chs
 }
 
-func ( *CmdHandleServer)Exec(cmd *[]string, ok *bool) error {
-    *ok = true
-    switch (*cmd)[1]{
-
-    case "stop":
-        //stopHeart()  //善后处理
-        global.Logger.Info("macheart has stopped!")
-        os.Exit(0)
-
-    default:
-        *ok = false
-
-    }
-    return nil
+func (chs *CmdHandleServer) Exec(cmd *[]string, ok *bool) error {
+	*ok = true
+	exec, yes := chs.cmds[(*cmd)[1]]
+	if !yes {
+		*ok = false
+		return nil
+	}
+	return exec(*cmd)
 }
 
-func init(){
-    cmdHandleServer := NewCmdHandleServer()
-    rpc.Register(cmdHandleServer)
+func init() {
+	cmdHandleServer := NewCmdHandleServer()
+	rpc.Register(cmdHandleServer)
 }

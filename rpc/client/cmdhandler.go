@@ -18,79 +18,86 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package client
 
 import (
-    "fmt"
-    "errors"
-    "net/rpc"
-    "macheart/global"
+	"errors"
+	"fmt"
+	"macheart/global"
+	"net/rpc"
 )
 
 type CmdHandler struct {
-    rpcClient *rpc.Client
+	rpcClient *rpc.Client
+	cmds      map[string]func(args []string) error
 }
 
-func NewCmdHandler()(*CmdHandler) {
-    cmdHandler := new(CmdHandler)
-    return cmdHandler
+func NewCmdHandler() *CmdHandler {
+	ch := new(CmdHandler)
+	ch.cmds = make(map[string]func(args []string) error)
+	// start
+	ch.cmds["start"] = func(args []string) error {
+		fmt.Println("had an instance running!")
+		return nil
+	}
+	// restart
+	ch.cmds["restart"] = func(args []string) error {
+		var ok bool
+		// 停止
+		args[1] = "stop"
+		fmt.Println("stopping macheart...")
+		err := ch.rpcClient.Call("CmdHandleServer.Exec", &args, &ok) //若停止成功，这里必然会返回错误,但是返回错误不一定表示服务停止成功;这里姑且认为返回错误就表示停止成功
+		if err != nil {
+			fmt.Println("macheart has stopped!")
+		} else {
+			fmt.Println("macheart stops has failed!")
+			return errors.New(args[1] + ": exec failed!")
+		}
+		// 启动
+		args[1] = "start"
+		fmt.Println("starting macheart...")
+		err = global.ForkOneself(args)
+		if err != nil {
+			fmt.Println("macheart starts has failed!")
+			return err
+		} else {
+			fmt.Println("macheart has started!")
+		}
+
+		return nil
+	}
+	// stop
+	ch.cmds["stop"] = func(args []string) error {
+		var ok bool
+		fmt.Println("stopping macheart...")
+		err := ch.rpcClient.Call("CmdHandleServer.Exec", &args, &ok)
+		if err != nil {
+			fmt.Println("macheart has stopped!")
+		} else {
+			fmt.Println("macheart stops has failed!")
+			return errors.New(args[1] + ": exec failed!")
+		}
+		return nil
+	}
+
+	return ch
 }
 
-func (ch *CmdHandler)LinkServer(net, addr string) error {
-    rpcClient, err := rpc.Dial(net, addr)
-    if err != nil {return err}
-    ch.rpcClient = rpcClient
-    return nil
+func (ch *CmdHandler) LinkServer(net, addr string) error {
+	rpcClient, err := rpc.Dial(net, addr)
+	if err != nil {
+		return err
+	}
+	ch.rpcClient = rpcClient
+	return nil
 }
 
-func (ch *CmdHandler)Close()error{
-    return ch.rpcClient.Close()
+func (ch *CmdHandler) Close() error {
+	return ch.rpcClient.Close()
 }
 
-func (ch *CmdHandler)Exec(cmd []string)error{
-
-    var ok bool
-
-    switch cmd[1]{
-
-    case "start":
-        fmt.Println("had an instance running!")
-
-    case "restart":
-
-        cmd[1] = "stop"
-        fmt.Println("stopping macheart...")
-        err := ch.rpcClient.Call("CmdHandleServer.Exec", &cmd, &ok) //若停止成功，这里必然会返回错误,但是返回错误不一定表示服务停止成功;这里姑且认为返回错误就表示停止成功
-        if err != nil {
-            fmt.Println("macheart has stopped!")
-        }else{
-            fmt.Println("macheart stops has failed!")
-            return errors.New(cmd[1] + ": exec failure")
-        }
-
-        cmd[1] = "start"
-        fmt.Println("starting macheart...")
-        err = global.ForkOneself(cmd)
-        if err != nil {
-            fmt.Println("macheart starts has failed!")
-            return err
-        }else {
-            fmt.Println("macheart has started!")
-        }
-
-    case "stop":
-        fmt.Println("stopping macheart...")
-        err := ch.rpcClient.Call("CmdHandleServer.Exec", &cmd, &ok)
-        if err != nil {
-            fmt.Println("macheart has stopped!")
-        }else{
-            fmt.Println("macheart stops has failed!")
-            return errors.New(cmd[1] + ": exec failure")
-        }
-
-    default:
-        fmt.Println("invalid arguments: ", cmd[1])
-        return errors.New("invalid arguments: " + cmd[1])
-
-    }
-
-    return nil
+func (ch *CmdHandler) Exec(cmd []string) error {
+	exec, ok := ch.cmds[cmd[1]]
+	if !ok {
+		fmt.Println("invalid arguments: ", cmd[1])
+		return errors.New("invalid arguments: " + cmd[1])
+	}
+	return exec(cmd)
 }
-
